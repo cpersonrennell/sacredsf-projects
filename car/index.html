@@ -1,0 +1,124 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+function noaction(e,type){
+	var attrs=e.currentTarget.attributes;
+	
+	var data=$(e.currentTarget).serializeArray();
+	console.log(data)
+	var url;
+	if(attrs.action)
+		url=attrs.action.value;
+	var redirect;
+	
+	if(attrs.redirect)
+		redirect=e.currentTarget.attributes.redirect.value;
+	var reload=false;
+	if(attrs.reload)
+		reload=true;
+	
+	var msg="Done!";
+	if(attrs.msg)
+		msg=attrs.msg.value;
+	
+	$.ajax({
+		method:type,
+		url:url,
+		data:data,
+	}).done(function(result){
+		console.log(result);
+		//required to update the on page stuff.
+		if(reload)
+			location.reload();
+		 $( "#msg" ).text( msg ).show().fadeOut( 3000 );
+		 if(redirect){
+			 if(redirect!="back")
+				setTimeout(function(){location.replace(redirect);},5000);
+			 else
+				setTimeout(function(){history.back()},5000);
+		}
+
+		if(attrs.callback)
+		{
+			MyApp.response_methods[attrs.callback.value](result)
+		}	
+	});
+	return false;
+}
+</script>
+
+<div style="display:inline-block">
+<form id="forward" class="noactionpost" action="/car/drive.php" method="POST">
+<input type="hidden" value="Forward" name="Forward"></input>
+<input type="submit" name="Forward" value="Forward" style="width:200px"></input>
+</form>
+</div>
+
+<div style="display:inline-block">
+<form id="reverse" class="noactionpost" action="/car/drive.php" method="POST">
+<input type="hidden" value="Reverse" name="Reverse"></input>
+<input type="submit" value="Reverse" style="width:200px"></input>
+</form>
+</div>
+
+<Br><br><br>
+
+<form id="stop" class="noactionpost" action="/car/drive.php" method="POST">
+<input type="hidden" value="Reverse" name="Stop"></input>
+<input type="submit" value="Stop" style="width:400px"></input>
+</form>
+
+<br>
+<br>
+
+<div style="display:inline-block">
+<form id="right_form" class="noactionpost" action="/car/drive.php" method="POST">
+<input type="hidden" value="Right" name="Right"></input>
+<input id="right" type="submit" value="Right" style="width:200px"></input>
+</form>
+
+</div>
+<div style="display:inline-block">
+<form id="left" class="noactionpost" action="/car/drive.php" method="POST">
+<input type="hidden" value="Left" name="Left"></input>
+<input type="submit" value="Left" style="width:200px"></input>
+</form>
+</div>
+<form id="speed" class="noactionpost" action="/car/drive.php" method="POST">
+<label>Speed</label>
+<input name="Speed" id="_speed" type="range" min = 0 max=255 step=1></input>
+</form>
+
+<script>
+$('.noactionpost').submit(function(e){
+	return noaction(e,"POST");
+});
+
+
+$("#speed").on("change",function(e){
+	data = {"Speed":e.currentTarget[0].value};
+	url ="/car/drive.php";
+	type="POST";
+	$.ajax({
+		method:type,
+		url:url,
+		data:data,
+	}).done(function(result){
+	console.log(result)
+});
+});
+
+var down = false;
+/*
+$('#right').on("mousedown",function(e){
+	console.log("down");
+	down = true;
+	setTimeout(function(){	while(down) setTimeout(function(){console.log("yolo");},500) },500)
+
+});
+
+$("#right").on("mouseup",function(e){
+	console.log("up");
+	down=false;
+})
+*/
+</script>
